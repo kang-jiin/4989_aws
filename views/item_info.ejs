@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./includes/head.ejs') %>
+
+<body>
+    <script>
+        let time = '<%= article.time %>';
+        let winner = '<%= article.bidder_id%>'
+        let d = parseInt(time / (60*60*24));
+        time -= d * (60*60*24);
+        let h = parseInt(time / (60 * 60));
+        time -= h * (60*60);
+        let m = parseInt(time / 60);
+        time -= m * (60);
+        let s = time;        
+        
+        function time_load() {
+            s--;
+            if (d <= 0 && s < 0) {
+            } else {
+
+                if(s == -1) {
+                  m--;
+                  s = 59;
+              }
+              if(m == -1) {
+                  h--;
+                  m = 59;
+                  s = 59;
+              }
+              if (h == -1) {
+                  d--;
+                  h = 59;
+                  m = 59;
+                  s = 59;
+              }
+              $("#time").text(d + '일 '+ h + '시간 ' + m + '분 ' + s + '초');
+            }    
+        }
+        $(document).ready(() => {
+            $("#time").text(d + '일 '+ h + '시간 ' + m + '분 ' + s + '초');
+            let time_load = setInterval("time_load()", 1000)
+        })
+    </script>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      $(() => {
+        let loginid = '<%= loginid %>';
+        let url = window.location.href;
+        let num = url.substring(url.lastIndexOf('/')+1);
+        
+        socket = io('/nsp');
+        socket.emit('joinRoom', num, loginid);       
+        
+        $('#ipchalform').submit(() => {
+            let inputstr = $('#money').val();
+            let sendstr = inputstr.replace(/,/gi, '');
+            socket.emit('chat message', sendstr);
+            $('#money').val('');
+            return false;
+        });
+        socket.on('chat message', (data) => {   
+            let bidder = '(' + data.id + ')';
+                            
+            $('#price').text(data.msg)
+            $('#bidder').text(bidder)
+        });
+      });
+      socket.on('chat message', (msg) => {
+
+        $('#price').text(msg)
+      });
+  </script>
+  <%- include('./includes/logo.ejs') %>
+  <!-- Page Content -->
+  <div class="container">
+
+    <!-- Page Heading/Breadcrumbs -->
+    <h1 class="mt-4 mb-3"><%=article.title%></h1>
+
+    <ol class="breadcrumb">
+      <!-- <li class="breadcrumb-item">
+        <a href="index.html">Home</a>
+      </li> -->
+      <li class="breadcrumb-item col-9 mt-1"><%=article.category%></li>
+      <div class="col-3" style="text-align: right">
+        <% if(user.userid == article.seller_id ) { %>
+        <a href="/item_modify?num=<%=article.id%>"><button class="btn btn-dark btn-sm" type="button"
+            id="modify">수정</button></a>
+        <a href="/item_delete?num=<%=article.id%>"><button class="btn btn-dark btn-sm" type="button"
+            id="delete">삭제</button></a>
+        <% }%>
+      </div>
+    </ol>
+
+    <!-- Intro Content -->
+    <div class="row">
+      <div class="col-lg-6">
+        <img style="width: 100%; min-height: 300px; max-height: 300px" class="img-fluid rounded mb-4"
+          src="<%=article.savefolder%>/<%=article.savename%>"> <!-- 750x450 -->
+      </div>
+      <div class="col-lg-6">
+        <% if(article.time > 0) { %>
+          <div style="margin-bottom: 15px; color: red;">
+              <span style="font-size: 30px;">남은시간 : </span>
+              <span id="time" style="font-size: 32px;"></span>
+            </div>
+        <%} else { %> 
+        <div style="margin-bottom: 15px;">
+          <span style="font-size: 30px;">낙찰자 : </span>
+          <span style="font-size: 32px;"><%= article.bidder_id %>님</span>
+        </div>
+        <% } %>
+        <div>
+          <div class="card-body" style="padding: 0 15px 0 5px;">
+            <div class="input-group" style="width: 450px;">
+              <div style="display: inline-block; width: 350px;">
+                  <% if(article.time > 0) { %>
+                    <span style="font-size: 30px;">현재가격 : </span>
+                    <span id="price" style="font-size: 35px;"><%=article.price %></span>
+                    <% if(article.bidder_id) { %>
+                    <span id="bidder" style="font-size: 20px;">(<%=article.bidder_id %>)</span>
+                    <% } else { %>
+                      <span id="bidder" style="font-size: 20px;"></span>
+                    <%}%>
+                  <%} else { %> 
+                    <span style="font-size: 30px;">낙찰가격 : </span>
+                    <span id="price" style="font-size: 35px;"><%=article.price %></span>
+                  <% } %>
+                </div>
+            </div>
+            <div style="color : gray; font-size: 80%; padding: 5px 0 0 20px;">※ 상한가 : <%= article.max_price%>원 이하 가격만 입찰
+              가능합니다.</div><br>
+          </div>
+          <div class="card-body" style="padding: 15px 15px 0 5px;">
+            <form id="ipchalform" action="">
+              <div class="input-group" style="width: 450px;">
+                <input id="money" type="text" style="width: 300px;" name="input_price" class="form-control"
+                  placeholder="금액을 입력하세요." onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' maxlength=8>
+                <span class="input-group-btn">
+                  <% if(user.userid && article.flag == 'true' && article.seller_id != user.userid) { %>
+                  <button id="ipchal" style="margin-left: 15px;" class="btn btn-secondary" type="submit">입찰하기!</button>
+                  <% } else { %>
+                  <button id="ipchal" style="margin-left: 15px;" class="btn btn-secondary" type="submit"
+                    disabled="disabled">입찰하기!</button>
+                  <% } %>
+          
+                </span>
+              </div>
+              <div style="color : gray; font-size: 80%; padding-bottom: 20px; padding: 5px 0 0 20px;">※ 주의사항 : 숫자만
+                입력하세요.
+              </div><br>
+            </form>
+          </div>
+          <table>
+            <tr>
+              <td style="vertical-align: text-top;">
+                <h5>판매자 정보</h5>
+              </td>
+              <td>
+                <ul>
+                  <li>아이디 : <%=article.seller_id %></li>
+                  <li>연락처 : <%=article.tel1 %> - <%=article.tel2 %> - <%=article.tel3 %></li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <!-- /.row -->
+    <div style="padding: 15px; border-top: 1.5px solid gray;">
+      <h3>상세설명</h3>
+      <div id="content" style="overflow-y:scroll; min-height: 300px; max-height: 700px"><%-article.content%></div>
+    </div>
+
+    <!-- Our Customers -->
+    <% if(category_results.length) { %>
+      <h2 style="padding: 15px; border-top: 1.5px solid gray;">같은 카테고리의 다른 상품</h2>
+      <% let len = category_results.length %>
+      <% if(category_results.length > 6) { %>
+      <% len = 6 %>
+      <% } %>
+      <div class="row">
+        <% for(let i = 0; i < len; i++) { %>
+        <div class="col-lg-2 col-sm-4 mb-4">
+          <div class="hovereffect">
+            <img style="width: 100%; min-height: 96px; max-height: 96px"
+              src="<%= category_results[i].savefolder%>/<%= category_results[i].savename%>" alt="">
+            <div class="overlay">
+              <a class="info" href="/item_info/<%= category_results[i].id %>">
+                <div><%=category_results[i].title %></div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      </div>
+      <%} %>
+
+    <!-- /.row -->
+    <div class="container mt-3">
+
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" data-toggle="tab" href="#home">댓글</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#menu1">입찰 목록</a>
+        </li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div id="home" class="container tab-pane active"><br>          
+          <br>
+          <div>
+          <form method="post" action="/comment/add?num=<%=article.id%>">
+            <div class="input-group" style="width: 100%;">
+              <input id="comment" type="text" style="width: 300px;" name="comment" class="form-control" placeholder="내용을 입력하세요." maxlength=255>
+              <span class="input-group-btn">
+                <% if(user.userid) { %>
+                  <button id="comment" style="margin-left: 15px;" class="btn btn-secondary" type="submit">등록</button>  
+                <% } else { %>
+                  <button id="comment" style="margin-left: 15px;" class="btn btn-secondary" type="submit" disabled="disabled">등록</button>
+                <%}%>
+                
+                <!-- <button type="button" id="comment" style="margin-left: 15px;" class="btn btn-secondary" onclick="location.href = '/login';">등록</button> -->
+              </span>
+            </div>
+          </form>
+        </div>
+          <br>
+          <table class="table table-hover">
+              <colgroup>
+                  <col width="*">
+                  <col width="10%">
+                  <col width="20%">
+              </colgroup>
+              <thead class="thead-dark">
+                  <tr>
+                      <th class="text-center">내용</th>
+                      <th class="text-center">작성자</th>
+                      <th class="text-center">작성 시간</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <% if(comment_lists.length == 0){ %>
+                    <tr>
+                        <td class="text-center" colspan="3">작성된 댓글이 없습니다.</td>
+                    </tr>
+                  <% } else { %>
+                    <% comment_lists.forEach(function(comment){ %>
+                      <tr>
+                          <td class="text-left"><%=comment.content%></td>
+                          <td class="text-center"><%=comment.writer%></td>
+                          <td class="text-center"><%=comment.time%></td>
+                      </tr>
+                    <% }); %>
+                  <% } %>
+              </tbody>
+          </table>
+        </div>
+        <div id="menu1" class="container tab-pane fade"><br>
+          <h3>최근 입찰</h3><br>
+          <table class="table table-hover">
+              <thead class="thead-dark">
+                  <tr>
+                      <th class="text-center">입찰자</th>
+                      <th class="text-center">가격</th>
+                      <th class="text-center">입찰 시간</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <% if(bid_lists.length == 0){ %>
+                    <tr>
+                        <td class="text-center" colspan="3">입찰 기록이 없습니다.</td>
+                    </tr>
+                  <% } else { %>
+                    <% bid_lists.forEach(function(bid){ %>
+                      <tr>
+                          <td class="text-center"><%=bid.bidder%></td>
+                          <td class="text-center"><%=bid.price%></td>
+                          <td class="text-center"><%=bid.time%></td>
+                      </tr>
+                    <% }); %>
+                  <% } %>
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <br>
+  </div>
+  <!-- /.container -->
+
+  <%- include('./includes/footer.ejs') %>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="/vendor/jquery/jquery.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/signup.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script type="text/javascript" src="/js/simple.money.format.js"></script>
+  <script type="text/javascript">
+    $('#money').simpleMoneyFormat();
+  </script>
+
+</body>
+
+
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./includes/head.ejs') %>
+
+<body>
+  <%- include('./includes/logo.ejs') %>
+  <!-- Page Content -->
+  <!-- Page Content -->
+  <div class="container border border-dark rounded"
+    style="margin-top:100px; margin-bottom: 120px; padding: 40px; width: 450px;">
+    <!-- Page Heading/Breadcrumbs -->
+    <h2>LOGIN</h2>
+    <p>Wellcome 4989</p>
+    <% if(pass == false) { %>
+      <p style="color: red;">아이디 또는 비밀번호가 잘못되었습니다.</p>
+    <% } %>
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label for="usr">ID:</label>
+        <input type="text" class="form-control" id="usr" name="username">
+      </div>
+      <div class="form-group">
+        <label for="pwd">Password:</label>
+        <input type="password" class="form-control" id="pwd" name="password">
+      </div>
+      <button type="submit" class="btn btn-primary">로그인</button>
+    </form>
+    <div style="margin-top: 10px">
+      <a href="/signup" class="" style="margin-right: 10px">회원가입</a>
+      <a href="/find_idpw" class="">아이디/비밀번호 찾기</a>
+    </div>
+
+  </div>
+  <!-- /.container -->
+
+  <!-- Footer -->
+  <%- include('./includes/footer.ejs') %>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="/vendor/jquery/jquery.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- <% if(pass == false) { %>
+    <script type="text/javascript">alert("아이디 또는 비밀번호가 잘못되었습니다.");</script>
+  <% } %>> -->
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+<!-- logo -->
+<div class="logo-fixed">
+    <a href="/"><img src="/img/logo_big.png" alt="" style="display: block; margin: 0px auto;"></a>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+                data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav m-auto">
+                <li id="first_li" class="nav-item">
+                    <a class="nav-link" href="/?category=fashion">패션</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/?category=life">생필품</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/?category=hobby">취미</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/?category=it">디지털/IT</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/?category=etc">기타</a>
+                </li>
+            </ul>
+            <% if(user.userid){ %>
+                <a href="/mypage"><button class="btn btn-primary" type="button" id="mypage" style="margin-right: 20px">my page</button></a>
+                <a href="/logout"><button class="btn btn-primary" type="button" id="logout" style="margin-right: 40px">로그아웃</button></a>
+            <% } else { %>
+                <a href="/login"><button class="btn btn-primary" type="button" id="login">로그인</button></a>
+            <% } %>
+   
+        </div> 
+    </div>
+</nav>

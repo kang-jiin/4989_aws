@@ -1,0 +1,23 @@
+<% for(let i = 0; i < c_article.length; i++) { %>
+    <div class="col-lg-4 col-sm-6 portfolio-item">
+        <div class="hovereffect">
+            <img style="width: 100%; min-height: 200px; max-height: 200px" src="<%=c_article[i].savefolder%>/<%=c_article[i].savename%>" alt="">
+            <div class="overlay">
+                <a class="info" href="/item_info/<%= c_article[i].id %>">
+                    <div>
+                        <span>제목 : </span>
+                        <span><%=c_article[i].title %></span>
+                    </div>
+                    <div>
+                        <span>현재가격 : </span>
+                        <span><%=c_article[i].price %></span>
+                    </div>
+                    <div>
+                        <span>종료시각 : </span>
+                        <span><%= c_article[i].time %></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+<% } %>

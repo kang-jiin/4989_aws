@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./includes/head.ejs') %>
+
+<body>
+    <%- include('./includes/logo.ejs') %>
+    <div>
+        <!-- Page Content -->
+        <div class="container">
+            <br>
+            <% if(user.userid) { %>
+            <h1><%=user.name%>님 환영합니다.</h1>
+            <% }%>
+            <!-- Search Section -->
+
+            <form method="POST" action="">
+                <div class="row">
+                    <div class="input-group col-4">
+                        <input type="text" style="width: 300px;" class="form-control" id="keyword" name="keyword">
+                    </div>
+                    <div class="input-group-btn col-2">
+                        <button class="btn btn-secondary" type="submit">검색</button>
+                    </div>
+
+                    <div class="col-6 text-right">
+                        <% if(user.userid) { %>
+                        <a href="/item_add"><button class="btn btn-secondary" type="button">물품 올리기</button></a>
+                        <% }%>
+                    </div>
+                </div>
+            </form>
+            <br>
+
+            <!-- Portfolio Section -->
+            <h2>인기품목</h2>
+
+            <div class="row">
+                <%- include('./includes/item_div_hit.ejs') %>
+            </div>
+
+            <!-- Portfolio Section -->
+            <h2>현재 진행 경매</h2>
+
+            <div class="row">
+                <%- include('./includes/item_div.ejs') %>
+            </div>
+
+            <hr>
+            <div class="text-right">
+                <ul class="pagination text-center">
+                    <% 
+                        for (var i = 0; i < cont; i++) {
+                    %>
+                    <li class="page-item"><a class="page-link" href="/?category=<%=data.category%>&keyword=<%=data.keyword%>&page=<%=i +1 %>"><%=i +1 %></a></li>
+                    <%
+                        }
+                    %>
+                    </ul>
+            </div>
+        </div>
+        <!-- /.container -->
+        <%- include('./includes/footer.ejs') %>
+
+                    <!-- Bootstrap core JavaScript -->
+                    <script src="/vendor/jquery/jquery.min.js"></script>
+                    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            </div>
+</body>
+
+</html>
