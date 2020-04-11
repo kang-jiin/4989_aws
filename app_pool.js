@@ -65,9 +65,9 @@ app.set('view engine', 'ejs');
 
 //-----------DB------------------
 const pool = mysql.createPool({
-    host: 'db-4989.cpuglwdnhpqg.ap-northeast-2.rds.amazonaws.com',
-    user: 'admin4989',
-    password: 'admin4989',
+    host: 'janedb.cpuglwdnhpqg.ap-northeast-2.rds.amazonaws.com',
+    user: 'admin1234',
+    password: 'admin1234',
     database: 'db4989',
     port: 3306,
     connectionLimit: 20,
