@@ -676,33 +676,32 @@ nsp.on('connection', (socket) => {
         });
     });
     socket.on('chat message', (msg) => {
-        let ipchal_update = `
-            update item
-            set price = ?, bidder_id = ?
+        let ipchal_check = `
+            select * from item
             where id = ?
             and price < ?
             and max_price >= ?
             and seller_id != ?
             and end_time > now()
         `;
+        let ipchal_update = `
+            update item
+            set price = ?, bidder_id = ?
+            where id = ?
+        `;
         let bid_insert = `
             insert into bid (item_id, bidder_id, price, time)
             values (?, ?, ?, now())
         `;
         pool.getConnection((err, connection) => {
-            connection.beginTransaction((err) => {
-                if (err) {
-                    connection.release();
-                    throw err;
-                }
-                connection.query(ipchal_update, [msg, id, num, msg, msg, id], (err, up_result) => {
-                    if (err) {
-                        connection.release();
-                        console.log(err);
-                        throw err;
-                    }
-                    if (up_result.changedRows == 1) {
-                        connection.query(bid_insert, [num, id, msg], (err, in_result) => {
+            connection.query(ipchal_check, [num, msg, msg, id], (err, check_result) => {
+                if (check_result.length == 1) {
+                    connection.beginTransaction((err) => {
+                        if (err) {
+                            connection.release();
+                            throw err;
+                        }
+                        connection.query(ipchal_update, [msg, id, num], (err, up_result) => {
                             if (err) {
                                 connection.rollback(() => {
                                     console.log(err);
@@ -710,7 +709,7 @@ nsp.on('connection', (socket) => {
                                     throw err;
                                 })
                             }
-                            connection.commit((err) => {
+                            connection.query(bid_insert, [num, id, msg], (err, in_result) => {
                                 if (err) {
                                     connection.rollback(() => {
                                         console.log(err);
@@ -718,12 +717,21 @@ nsp.on('connection', (socket) => {
                                         throw err;
                                     })
                                 }
-                                connection.release();
-                                nsp.to(num).emit('chat message', {msg: numberWithCommas(msg), id: id});
+                                connection.commit((err) => {
+                                    if (err) {
+                                        connection.rollback(() => {
+                                            console.log(err);
+                                            connection.release();
+                                            throw err;
+                                        })
+                                    }
+                                    connection.release();
+                                    nsp.to(num).emit('chat message', {msg: numberWithCommas(msg), id: id});
+                                });
                             });
                         });
-                    }
-                });
+                    });
+                }
             });
         });
     });
