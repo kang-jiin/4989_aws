@@ -243,25 +243,18 @@ app.post('/item_add_content', upload.single('img'), (req, res) => {
     `;
 
     pool.getConnection((err, connection) => {
-        connection.query(item_insert, values, (err, result) => {
-            if (err) {
-                console.log(err);
-                connection.release();
-                res.status(500).send('Internal Server Error!!!');
-            }
-            let pageId = result.insertId;
-            let upload_folder = uploadformat.dateFormat();
-            let values2 = [upload_folder, req.file.originalname, req.file.filename, result.insertId];
-
-            connection.query(img_insert, values2, (err, result) => {
+        connection.beginTransaction((err) => {
+            connection.query(item_insert, values, (err, result) => {
                 if (err) {
-                    connection.rollback(() => {
-                        console.log(err);
-                        connection.release();
-                        res.status(500).send('Internal Server Error!!!');
-                    })
+                    console.log(err);
+                    connection.release();
+                    res.status(500).send('Internal Server Error!!!');
                 }
-                connection.commit((err) => {
+                let pageId = result.insertId;
+                let upload_folder = uploadformat.dateFormat();
+                let values2 = [upload_folder, req.file.originalname, req.file.filename, result.insertId];
+
+                connection.query(img_insert, values2, (err, result) => {
                     if (err) {
                         connection.rollback(() => {
                             console.log(err);
@@ -269,9 +262,18 @@ app.post('/item_add_content', upload.single('img'), (req, res) => {
                             res.status(500).send('Internal Server Error!!!');
                         })
                     }
-                    console.log('result : ', result);
-                    connection.release();
-                    res.redirect('/item_info/' + pageId);
+                    connection.commit((err) => {
+                        if (err) {
+                            connection.rollback(() => {
+                                console.log(err);
+                                connection.release();
+                                res.status(500).send('Internal Server Error!!!');
+                            })
+                        }
+                        console.log('result : ', result);
+                        connection.release();
+                        res.redirect('/item_info/' + pageId);
+                    });
                 });
             });
         });
