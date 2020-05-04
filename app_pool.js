@@ -73,13 +73,16 @@ const pool = mysql.createPool({
     connectionLimit: 20,
     waitForConnection: false
 });
+//-----------DB------------------
+
 http.listen(8888, () => {
     console.log('8888 port opened!!!');
 })
-//-----------DB------------------
+
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
 app.get('/', (req, res) => {
     let category, key, page;
 
@@ -167,7 +170,6 @@ app.get('/login', (req, res) => {
     res.render('login', { pass: true });
 })
 
-
 app.post('/login', (req, res) => {
     const sess = req.session;
     let values = [req.body.username, req.body.password];
@@ -197,6 +199,16 @@ app.post('/login', (req, res) => {
                 res.render('login', { pass: false });
             }
         })
+    });
+})
+
+app.get('/guestlogin', (req, res) => {
+    const sess = req.session;
+    sess.userid = 'honggd';
+    sess.name = '홍길동';
+    sess.grade = 'G';
+    req.session.save(() => {
+        res.redirect('/');
     });
 })
 

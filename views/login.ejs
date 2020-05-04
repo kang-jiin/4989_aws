@@ -6,12 +6,11 @@
 <body>
   <%- include('./includes/logo.ejs') %>
   <!-- Page Content -->
-  <!-- Page Content -->
   <div class="container border border-dark rounded"
-    style="margin-top:100px; margin-bottom: 120px; padding: 40px; width: 450px;">
+    style="margin-top:100px; margin-bottom: 100px; padding: 40px; width: 500px;">
     <!-- Page Heading/Breadcrumbs -->
     <h2>LOGIN</h2>
-    <p>Wellcome 4989</p>
+    <p>Welcome 4989</p>
     <% if(pass == false) { %>
       <p style="color: red;">아이디 또는 비밀번호가 잘못되었습니다.</p>
     <% } %>
@@ -26,11 +25,22 @@
       </div>
       <button type="submit" class="btn btn-primary">로그인</button>
     </form>
-    <div style="margin-top: 10px">
-      <a href="/signup" class="" style="margin-right: 10px">회원가입</a>
+    <div class="mt-2 mb-4">
+      <a href="/signup" class="mr-2">회원가입</a>
       <a href="/find_idpw" class="">아이디/비밀번호 찾기</a>
     </div>
-
+    <div class="container mt-2">
+      <div class="row">
+        <div class="col-xs-7">
+          사구팔구 회원이 아니신가요?<br/>테스트 계정으로 체험해보세요!
+        </div>
+        <div class="col ml-auto align-self-center">
+          <a href="/guestlogin">
+            <button class="btn btn-secondary" type="button" href="/guestlogin">게스트로 체험하기</button>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
   <!-- /.container -->
 
