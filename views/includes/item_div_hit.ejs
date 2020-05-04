@@ -1,5 +1,5 @@
-<% if(h_article.length > 1) { %>
 <% for(let i = 0; i < 3; i++) { %>
+    <% if(h_article.length == 0 || i >= h_article.length) { break; }%>
     <div class="col-lg-4 col-sm-6 portfolio-item">
         <div class="hovereffect">
             <img style="width: 100%; min-height: 200px; max-height: 200px" src="<%=h_article[i].savefolder%>/<%=h_article[i].savename%>" alt="">
@@ -22,5 +22,4 @@
             </div>
         </div>
     </div>
-<% } %>
 <% } %>
