@@ -352,7 +352,10 @@ app.get('/item_delete', (req, res) => {
         from img
         where item_id = ?
     `;
-
+    let img_delete = `
+        delete from img
+        where item_id = ?
+    `;
     let item_delete = `
         delete from item
         where id = ?
@@ -365,23 +368,30 @@ app.get('/item_delete', (req, res) => {
                 connection.release();
                 res.status(500).send('Internal Server Error!!!');
             }
-            connection.query(item_delete, num, (err) => {
+            connection.query(img_delete, num, (err) => {
                 if (err) {
                     console.log(err);
                     connection.release();
                     res.status(500).send('Internal Server Error!!!');
                 }
-                if (result[0].savefolder) {
-                    fs.unlink('./uploads/' + result[0].savefolder + '/' + result[0].savename, (err) => {
-                        if (err) {
-                            console.log(err);
-                            conn.release();
-                            throw err;
-                        }
-                    });
-                }
-                res.redirect('/');
-            });
+                connection.query(item_delete, num, (err) => {
+                    if (err) {
+                        console.log(err);
+                        connection.release();
+                        res.status(500).send('Internal Server Error!!!');
+                    }
+                    if (result[0].savefolder) {
+                        fs.unlink('./uploads/' + result[0].savefolder + '/' + result[0].savename, (err) => {
+                            if (err) {
+                                console.log(err);
+                                conn.release();
+                                throw err;
+                            }
+                        });
+                    }
+                    res.redirect('/');
+                });
+            })
         });
     });
 });
