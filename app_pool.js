@@ -749,3 +749,16 @@ nsp.on('connection', (socket) => {
         console.log('user disconnected');
     });
 });
+
+//////////////////////////////////////////////////////////////
+//               error page (무조건 맨밑!!)                  //
+//////////////////////////////////////////////////////////////
+
+app.use(function (req, res, next) {
+    throw new Error(req.url + ' not found');
+});
+
+app.use(function (err, req, res, next) {
+    res.status(500);
+    res.redirect('/');
+});
