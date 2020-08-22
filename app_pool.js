@@ -64,7 +64,7 @@ app.set('views', './views');
 app.set('view engine', 'ejs');
 
 //-----------DB------------------
-var db_config  = require('./db-config.json');
+var db_config = require('./db-config.json');
 const pool = mysql.createPool({
     host: db_config.host,
     user: db_config.user,
@@ -468,15 +468,17 @@ app.get('/item_info/:num', (req, res) => {
                             connection.release();
                             res.status(500).send('Internal Server Error!!!');
                         }
-                        connection.query(same_category, [results[0].category, results[0].id], (err, category_results, fields) => {
-                            if (err) {
-                                console.log(err);
+                        if (results.length > 0) {
+                            connection.query(same_category, [results[0].category, results[0].id], (err, category_results, fields) => {
+                                if (err) {
+                                    console.log(err);
+                                    connection.release();
+                                    res.status(500).send('Internal Server Error!!!');
+                                }
                                 connection.release();
-                                res.status(500).send('Internal Server Error!!!');
-                            }
-                            connection.release();
-                            res.render('item_info', { article: results[0], loginid: loginid, category_results: category_results, bid_lists: bid_lists, comment_lists: comment_lists });
-                        });
+                                res.render('item_info', { article: results[0], loginid: loginid, category_results: category_results, bid_lists: bid_lists, comment_lists: comment_lists });
+                            });
+                        } else res.redirect('/');
                     });
                 });
             });
@@ -501,8 +503,8 @@ app.post('/comment/add', (req, res) => {
                 console.log(err);
                 connection.release();
                 res.status(500).send('Internal Server Error!!!');
-            }            
-            res.redirect('/item_info/'+ num);
+            }
+            res.redirect('/item_info/' + num);
             connection.release();
         });
     });
@@ -599,7 +601,7 @@ app.get('/mypage', (req, res) => {
         where item.id = img.item_id
         and item.seller_id = ?
     `;
-    let cham_data_query =`
+    let cham_data_query = `
         select item.title tit, item.id itid, img.savefolder savefolder, img.savename savename
         from bid, item, img
         where bid.item_id = item.id
@@ -620,14 +622,14 @@ app.get('/mypage', (req, res) => {
                     res.status(500).send('Internal Server Error!!!')
                 }
                 connection.query(cham_data_query, [userid], (err, kint, fields) => {
-                if (err) {
-                    console.log(err);
+                    if (err) {
+                        console.log(err);
+                        connection.release();
+                        res.status(500).send('Internal Server Error!!!')
+                    }
                     connection.release();
-                    res.status(500).send('Internal Server Error!!!')
-                }
-                connection.release();
-                res.render('mypage', { article: results[0], itresult: itemresults, itemresult: kint });
-            });
+                    res.render('mypage', { article: results[0], itresult: itemresults, itemresult: kint });
+                });
             });
         });
     });
@@ -736,7 +738,7 @@ nsp.on('connection', (socket) => {
                                         })
                                     }
                                     connection.release();
-                                    nsp.to(num).emit('chat message', {msg: numberWithCommas(msg), id: id});
+                                    nsp.to(num).emit('chat message', { msg: numberWithCommas(msg), id: id });
                                 });
                             });
                         });
