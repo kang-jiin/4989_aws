@@ -384,7 +384,7 @@ app.get('/item_delete', (req, res) => {
                         fs.unlink('./uploads/' + result[0].savefolder + '/' + result[0].savename, (err) => {
                             if (err) {
                                 console.log(err);
-                                conn.release();
+                                connection.release();
                                 throw err;
                             }
                         });
