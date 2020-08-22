@@ -380,15 +380,15 @@ app.get('/item_delete', (req, res) => {
                         connection.release();
                         res.status(500).send('Internal Server Error!!!');
                     }
-                    if (result[0].savefolder) {
-                        fs.unlink('./uploads/' + result[0].savefolder + '/' + result[0].savename, (err) => {
-                            if (err) {
-                                console.log(err);
-                                connection.release();
-                                throw err;
-                            }
-                        });
-                    }
+                    // if (result[0].savefolder) {
+                    //     fs.unlink('./uploads/' + result[0].savefolder + '/' + result[0].savename, (err) => {
+                    //         if (err) {
+                    //             console.log(err);
+                    //             connection.release();
+                    //             throw err;
+                    //         }
+                    //     });
+                    // }
                     res.redirect('/');
                 });
             })
